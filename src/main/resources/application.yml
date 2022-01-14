@@ -1,0 +1,17 @@
+server:
+  port: 8082
+  error:
+    include-message: always
+    include-exception: false
+
+spring:
+  application:
+    name: api
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/chat-app
+    username: root
+    password: root
