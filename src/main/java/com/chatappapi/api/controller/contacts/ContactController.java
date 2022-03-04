@@ -29,6 +29,13 @@ public class ContactController {
         return contactBusiness.getAllContacts(emailLoggedUser);
     }
 
+    @GetMapping(path = "find-contact/{idContact}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ContactProjection getContactById(@PathVariable(name = "idContact") Long idContact,
+                                            HttpServletRequest request) {
+        String emailLoggedUser = jwtUtil.getUserNameFromJwtToken(request.getHeader("Authorization"));
+        return contactBusiness.getContact(emailLoggedUser, idContact);
+    }
+
     @PostMapping
     public ContactProjection saveContact(@RequestBody ContactSaveProjection contactProjection,
                                          HttpServletRequest request) {

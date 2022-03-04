@@ -5,7 +5,6 @@ import com.chatappapi.api.converter.DozerConverter;
 import com.chatappapi.api.repository.MessageRepository;
 import com.chatappapi.api.util.ActiveUserChangeListener;
 import com.chatappapi.api.util.ActiveUserManager;
-import com.chatappapi.api.util.JwtUtil;
 import com.chatcomponents.Message;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;

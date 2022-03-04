@@ -41,18 +41,28 @@ public class ContactBusiness {
 
         if (listContacts.size() > 0) {
             listContacts.stream().forEach(contact -> {
-                UserProjection userProjection = null;
-                if (contact.getUserA().getId() == loggedUser.get().getId()) {
-                    userProjection = new UserProjection(contact.getUserB().getId(), contact.getUserB().getName(), contact.getUserB().getEmail());
-                } else {
-                    userProjection = new UserProjection(contact.getUserA().getId(), contact.getUserA().getName(), contact.getUserA().getEmail());
-                }
+                UserProjection userProjection = getUserContact(loggedUser.get(), contact);
 
                 ContactProjection ContactSaveProjection = new ContactProjection(contact.getId(), userProjection, contact.getUpdatedIn(), contact.getCreatedIn());
                 contactsProjections.add(ContactSaveProjection);
             });
         }
         return contactsProjections;
+    }
+
+    private UserProjection getUserContact(User loggedUser, Contact contact) {
+        if (contact.getUserA().getId() == loggedUser.getId()) {
+            return new UserProjection(contact.getUserB().getId(), contact.getUserB().getName(), contact.getUserB().getEmail());
+        } else {
+            return new UserProjection(contact.getUserA().getId(), contact.getUserA().getName(), contact.getUserA().getEmail());
+        }
+    }
+
+    public ContactProjection getContact(String emailLoggedUser, Long idContact) {
+        Optional<User> loggedUser = userRepository.findOne(QUser.user.email.eq(emailLoggedUser));
+        Optional<Contact> contact = contactRepository.findById(idContact);
+        UserProjection userProjection = getUserContact(loggedUser.get(), contact.get());
+        return new ContactProjection(contact.get().getId(), userProjection, contact.get().getUpdatedIn(), contact.get().getCreatedIn());
     }
 
     public ContactProjection saveContact(Contact contact, String emailLoggedUser) {
@@ -62,7 +72,7 @@ public class ContactBusiness {
 
         Contact savedContact = contactRepository.save(contact);
 
-        UserProjection userProjection = new UserProjection();
+        UserProjection userProjection;
         if (savedContact.getUserB().getId() == userSender.get().getId()) {
             userProjection = DozerConverter.parseObject(savedContact.getUserA(), UserProjection.class);
         } else {
