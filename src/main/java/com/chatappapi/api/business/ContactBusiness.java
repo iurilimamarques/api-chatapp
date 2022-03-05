@@ -8,6 +8,7 @@ import com.chatappapi.api.repository.UserRepository;
 import com.chatcomponents.Contact;
 import com.chatcomponents.QUser;
 import com.chatcomponents.User;
+import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.chatcomponents.QContact.contact;
 
@@ -29,19 +28,18 @@ public class ContactBusiness {
     @Autowired
     private UserRepository userRepository;
 
-    public List<ContactProjection> getAllContacts(String email) {
-        Optional<User> loggedUser = userRepository.findOne(QUser.user.email.eq(email));
-        BooleanExpression where = contact.userA.email.eq(email).or(contact.userB.email.eq(email));
-        Iterable<Contact> contacts = contactRepository.findAll(where, contact.createdIn.desc(), contact.updatedIn.desc());
+    public List<ContactProjection> getAllContacts(String emailLoggedUser) {
+        User loggedUser = getLoggedUser(emailLoggedUser);
+        BooleanExpression where = contact.userA.email.eq(emailLoggedUser).or(contact.userB.email.eq(emailLoggedUser));
+        Iterable<Contact> contacts = contactRepository.findAll(where, contact.updatedIn.desc(), contact.createdIn.desc());
 
-        List<Contact> listContacts = StreamSupport.stream(contacts.spliterator(), false)
-                .collect(Collectors.toList());
+        List<Contact> listContacts = ImmutableList.copyOf(contacts);;
 
         List<ContactProjection> contactsProjections = new ArrayList<>();
 
         if (listContacts.size() > 0) {
             listContacts.stream().forEach(contact -> {
-                UserProjection userProjection = getUserContact(loggedUser.get(), contact);
+                UserProjection userProjection = getUserRecipientOfContact(loggedUser, contact);
 
                 ContactProjection ContactSaveProjection = new ContactProjection(contact.getId(), userProjection, contact.getUpdatedIn(), contact.getCreatedIn());
                 contactsProjections.add(ContactSaveProjection);
@@ -50,7 +48,12 @@ public class ContactBusiness {
         return contactsProjections;
     }
 
-    private UserProjection getUserContact(User loggedUser, Contact contact) {
+    private User getLoggedUser(String emailLoggedUser) {
+        Optional<User> loggedUser = userRepository.findOne(QUser.user.email.eq(emailLoggedUser));
+        return loggedUser.get();
+    }
+
+    private static UserProjection getUserRecipientOfContact(User loggedUser, Contact contact) {
         if (contact.getUserA().getId() == loggedUser.getId()) {
             return new UserProjection(contact.getUserB().getId(), contact.getUserB().getName(), contact.getUserB().getEmail());
         } else {
@@ -59,21 +62,21 @@ public class ContactBusiness {
     }
 
     public ContactProjection getContact(String emailLoggedUser, Long idContact) {
-        Optional<User> loggedUser = userRepository.findOne(QUser.user.email.eq(emailLoggedUser));
+        User loggedUser = getLoggedUser(emailLoggedUser);
         Optional<Contact> contact = contactRepository.findById(idContact);
-        UserProjection userProjection = getUserContact(loggedUser.get(), contact.get());
+        UserProjection userProjection = getUserRecipientOfContact(loggedUser, contact.get());
         return new ContactProjection(contact.get().getId(), userProjection, contact.get().getUpdatedIn(), contact.get().getCreatedIn());
     }
 
     public ContactProjection saveContact(Contact contact, String emailLoggedUser) {
-        BooleanExpression where = QUser.user.email.eq(emailLoggedUser);
-        Optional<User> userSender = userRepository.findOne(where);
-        contact.setUserA(userSender.get());
+        User loggedUser = getLoggedUser(emailLoggedUser);
+
+        contact.setUserA(loggedUser);
 
         Contact savedContact = contactRepository.save(contact);
 
         UserProjection userProjection;
-        if (savedContact.getUserB().getId() == userSender.get().getId()) {
+        if (savedContact.getUserB().getId() == loggedUser.getId()) {
             userProjection = DozerConverter.parseObject(savedContact.getUserA(), UserProjection.class);
         } else {
             userProjection = DozerConverter.parseObject(savedContact.getUserB(), UserProjection.class);
