@@ -1,4 +1,4 @@
-package com.chatappapi.api.controller.messages.projection;
+package com.chatappapi.api.controller.messages.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class MessageProjection implements Serializable {
+public class MessageDto implements Serializable {
 
     private Long id;
 
@@ -18,10 +18,10 @@ public class MessageProjection implements Serializable {
     @JsonFormat(pattern="HH:mm dd/MM/yyyy")
     private LocalDateTime createdIn;
 
-    private UserProjection userSender;
+    private UserDto userSender;
 
-    private UserProjection userRecipient;
+    private UserDto userRecipient;
 
-    private ContactProjection contact;
+    private ContactDto contact;
 
 }

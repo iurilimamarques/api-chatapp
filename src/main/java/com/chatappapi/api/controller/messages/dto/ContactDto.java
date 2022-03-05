@@ -1,4 +1,4 @@
-package com.chatappapi.api.controller.messages.projection;
+package com.chatappapi.api.controller.messages.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ContactProjection implements Serializable {
+public class ContactDto implements Serializable {
 
     private long id;
 
-    private UserProjection user;
+    private UserDto user;
 
     private LocalDateTime updatedIn;
 

@@ -1,4 +1,4 @@
-package com.chatappapi.api.controller.messages.projection;
+package com.chatappapi.api.controller.messages.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProjection implements Serializable {
+public class UserDto implements Serializable {
 
     private long id;
 

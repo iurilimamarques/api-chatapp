@@ -1,6 +1,6 @@
-package com.chatappapi.api.controller.contacts.projection;
+package com.chatappapi.api.controller.contacts.dto;
 
-import com.chatappapi.api.controller.messages.projection.UserProjection;
+import com.chatappapi.api.controller.messages.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContactProjection implements Serializable {
+public class ContactDto implements Serializable {
 
     private long id;
 
-    private UserProjection user;
+    private UserDto user;
 
     private LocalDateTime updatedIn;
 

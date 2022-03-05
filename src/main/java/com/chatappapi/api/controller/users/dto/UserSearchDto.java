@@ -1,4 +1,4 @@
-package com.chatappapi.api.controller.users.projection;
+package com.chatappapi.api.controller.users.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class UserSearchProjection implements Serializable {
+public class UserSearchDto implements Serializable {
 
     private long id;
 

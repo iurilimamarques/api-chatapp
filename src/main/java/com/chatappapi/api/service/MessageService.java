@@ -1,6 +1,6 @@
-package com.chatappapi.api.business;
+package com.chatappapi.api.service;
 
-import com.chatappapi.api.controller.messages.projection.MessageProjection;
+import com.chatappapi.api.controller.messages.dto.MessageDto;
 import com.chatappapi.api.converter.DozerConverter;
 import com.chatappapi.api.repository.ContactRepository;
 import com.chatappapi.api.repository.MessageRepository;
@@ -9,7 +9,6 @@ import com.chatcomponents.Contact;
 import com.chatcomponents.Message;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +20,19 @@ import java.util.Set;
 import static com.chatcomponents.QContact.contact;
 
 @Component
-public class MessageBusiness {
+public class MessageService {
 
-    @Autowired
-    private ContactRepository contactRepository;
+    private final ContactRepository contactRepository;
+    private final MessageRepository messageRepository;
+    private final SimpMessagingTemplate webSocket;
+    private final ActiveUserManager activeUserManager;
 
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private SimpMessagingTemplate webSocket;
-
-    @Autowired
-    private ActiveUserManager activeUserManager;
+    public MessageService(ContactRepository contactRepository, MessageRepository messageRepository, SimpMessagingTemplate webSocket, ActiveUserManager activeUserManager) {
+        this.contactRepository = contactRepository;
+        this.messageRepository = messageRepository;
+        this.webSocket = webSocket;
+        this.activeUserManager = activeUserManager;
+    }
 
     @Transactional
     public void sendMessage(Message chatMessage) {
@@ -45,7 +44,7 @@ public class MessageBusiness {
                 .build();
         messageRepository.save(message);
         message.setContact(updateContact(message.getContact()));
-        MessageProjection result = DozerConverter.parseObject(message, MessageProjection.class);
+        MessageDto result = DozerConverter.parseObject(message, MessageDto.class);
 
         webSocket.convertAndSendToUser(chatMessage.getUserRecipient().getEmail(), "/queue/messages", result);
     }
@@ -57,13 +56,13 @@ public class MessageBusiness {
         return contactRepository.save(contact);
     }
 
-    public List<MessageProjection> loadAllMessages(Long idContact) {
+    public List<MessageDto> loadAllMessages(Long idContact) {
         BooleanExpression where = contact.id.eq(idContact);
         Iterable<Message> messages = messageRepository.findAll(where);
 
         List<Message> listMessages = ImmutableList.copyOf(messages);
 
-        return DozerConverter.parseListObjects(listMessages, MessageProjection.class);
+        return DozerConverter.parseListObjects(listMessages, MessageDto.class);
     }
 
     public void notifyActiveUserChange() {
