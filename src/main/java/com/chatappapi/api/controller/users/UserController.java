@@ -26,9 +26,10 @@ public class UserController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserSearchDto> findUser(@RequestParam(name = "keyWord") String keyWord,
+                                        @RequestParam(name = "notIn") String idsSelected,
                                         HttpServletRequest request) {
         String emailLoggedUser = jwtUtil.getUserNameFromJwtToken(request.getHeader("Authorization"));
-        return userService.findUser(keyWord, emailLoggedUser);
+        return userService.findUser(keyWord, emailLoggedUser, idsSelected);
     }
 
 }
