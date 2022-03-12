@@ -91,20 +91,25 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.iurilimamarques.chat-components</groupId>
+			<artifactId>chat-entities</artifactId>
+			<version>527f6d48e6</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.chatcomponents</groupId>
+				<groupId>com.github.iurilimamarques</groupId>
 				<artifactId>chat-components</artifactId>
-				<version>${chat-components.version}</version>
+				<version>527f6d48e6</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<profiles>
 		<profile>
 			<properties>
@@ -171,4 +176,26 @@
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>central</id>
+			<url>https://repo1.maven.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
 </project>
