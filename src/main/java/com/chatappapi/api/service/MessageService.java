@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.chatcomponents.QContact.contact;
@@ -51,9 +52,9 @@ public class MessageService {
 
     @Transactional
     private Contact updateContact(Contact c) {
-        Contact contact = contactRepository.getById(c.getId());
-        contact.setUpdatedIn(LocalDateTime.now());
-        return contactRepository.save(contact);
+        Optional<Contact> contact = contactRepository.findById(c.getId());
+        contact.get().setUpdatedIn(LocalDateTime.now());
+        return contactRepository.save(contact.get());
     }
 
     public List<MessageDto> loadAllMessages(Long idContact) {
