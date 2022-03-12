@@ -105,22 +105,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<profiles>
-		<profile>
-			<properties>
-				<environment>local</environment>
-				<skipPageMappings>true</skipPageMappings>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<property>
-					<name>environment</name>
-					<value>local</value>
-				</property>
-			</activation>
-			<id>local</id>
-		</profile>
-	</profiles>
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
@@ -141,6 +125,9 @@
 						<configuration>
 							<outputDirectory>target/generated-sources/querydsl</outputDirectory>
 							<processors>
+<!--								<processor>-->
+<!--									org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor-->
+<!--								</processor>-->
 								<processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
 							</processors>
 						</configuration>
