@@ -21,10 +21,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        String allowedUrl = "http://localhost:8083";
-        registry.addEndpoint("/chat").setAllowedOrigins(allowedUrl);
-        registry.addEndpoint("/chat/**").setAllowedOrigins(allowedUrl).withSockJS();
-//        registry.addEndpoint("/chat/**").withSockJS();
+//        String allowedUrl = "http://localhost:8083";
+//        registry.addEndpoint("/chat").setAllowedOrigins(allowedUrl);
+//        registry.addEndpoint("/chat/**").setAllowedOrigins(allowedUrl).withSockJS();
+        registry.addEndpoint("/chat/**").withSockJS();
     }
 
     @Override
