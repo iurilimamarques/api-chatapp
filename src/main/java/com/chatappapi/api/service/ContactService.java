@@ -2,10 +2,10 @@ package com.chatappapi.api.service;
 
 import com.chatappapi.api.controller.contacts.dto.ContactDto;
 import com.chatappapi.api.controller.messages.dto.UserDto;
-import com.chatappapi.api.converter.DozerConverter;
 import com.chatappapi.api.repository.ContactRepository;
 import com.chatappapi.api.repository.UserRepository;
 import com.chatcomponents.Contact;
+import com.chatcomponents.QContact;
 import com.chatcomponents.QUser;
 import com.chatcomponents.User;
 import com.google.common.collect.ImmutableList;
@@ -69,20 +69,25 @@ public class ContactService {
         return new ContactDto(contact.get().getId(), userDto, contact.get().getUpdatedIn(), contact.get().getCreatedIn());
     }
 
+    private Optional<Contact> verifyContactExistence(User loggedUser, UserDto userRecipient) {
+        BooleanExpression where = contact.userA.id.eq(loggedUser.getId()).or(contact.userB.id.eq(loggedUser.getId()))
+                .and(QContact.contact.userA.id.eq(userRecipient.getId()).or(QContact.contact.userB.id.eq(userRecipient.getId())));
+        return contactRepository.findOne(where);
+    }
+
     public ContactDto saveContact(Contact contact, String emailLoggedUser) {
         User loggedUser = getLoggedUser(emailLoggedUser);
 
-        contact.setUserA(loggedUser);
+        UserDto userRecipient = new UserDto(contact.getUserB().getId(), contact.getUserB().getName(), contact.getUserB().getEmail());
 
-        Contact savedContact = contactRepository.save(contact);
+        Optional<Contact> contactExistent = verifyContactExistence(loggedUser, userRecipient);
 
-        UserDto userDto;
-        if (savedContact.getUserB().getId() == loggedUser.getId()) {
-            userDto = DozerConverter.parseObject(savedContact.getUserA(), UserDto.class);
+        if (contactExistent.isPresent()) {
+            return new ContactDto(contactExistent.get().getId(), userRecipient, contactExistent.get().getUpdatedIn(), contactExistent.get().getCreatedIn());
         } else {
-            userDto = DozerConverter.parseObject(savedContact.getUserB(), UserDto.class);
+            contact.setUserA(loggedUser);
+            Contact savedContact = contactRepository.save(contact);
+            return new ContactDto(savedContact.getId(), userRecipient, savedContact.getUpdatedIn(), savedContact.getCreatedIn());
         }
-
-        return new ContactDto(savedContact.getId(), userDto, savedContact.getUpdatedIn(), savedContact.getCreatedIn());
     }
 }

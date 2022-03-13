@@ -1,6 +1,7 @@
 package com.chatappapi.api.config;
 
 import com.chatappapi.api.util.UserInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -12,6 +13,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @Value("${api-chatapp.allowed-domain-websocket-request}")
+    private String allowedDomainWebsocketRequest;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic", "/queue");
@@ -21,9 +25,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        String allowedUrl = "https://frontend-chatapp.herokuapp.com/";
-        registry.addEndpoint("/chat").setAllowedOrigins(allowedUrl);
-        registry.addEndpoint("/chat/**").setAllowedOrigins(allowedUrl).withSockJS();
+        registry.addEndpoint("/chat").setAllowedOrigins(allowedDomainWebsocketRequest);
+        registry.addEndpoint("/chat/**").setAllowedOrigins(allowedDomainWebsocketRequest).withSockJS();
     }
 
     @Override
