@@ -3,10 +3,17 @@ jdk:
   - openjdk11
 dist: xenial
 before_deploy:
-  - rvm $(travis_internal_ruby) --fuzzy do ruby -S gem install faraday -v 1.10.0
-deploy:
-  provider: heroku
-  api_key: $HEROKU_API_KEY
-  app: api-chatapp-project
+  - openssl aes-256-cbc -K $encrypted_db2095f63ba3_key -iv $encrypted_db2095f63ba3_iv -in deploy_rsa.enc -out deploy_rsa -d
+  - eval "$(ssh-agent -s)"
+  - cp .travis/deploy_rsa ~/.ssh/deploy_rsa
+  - chmod 600 ~/.ssh/deploy_rsa
+  - ssh-add ~/.ssh/deploy_rsa
 before_install:
   - ./mvnw clean package -DskipTests=true -Dmaven.javadoc.skip=true -e
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash scripts/deploy.sh
+    on:
+      repo: iurilimamarques/api-chatapp
+      branch: master
