@@ -1,1 +1,0 @@
-web: java -Dserver.port=$PORT $JAVA_OPTS -jar -Dspring.profiles.active=$ENVIRONMENT target/api-chatapp.jar
